@@ -23,3 +23,9 @@ export const registerRules = [
     return true;
   }).withMessage("La confirmacion de la contraseña no coincide"),
 ];
+
+export const loginRules = [
+  body("email").notEmpty().withMessage("El correo es requerido"),
+  body("email").isEmail().withMessage("El correo es invalido"),
+  body("password").notEmpty().withMessage("La contraseña es requerida"),
+];
