@@ -2,6 +2,7 @@ import type { Request, Response } from "express";
 import { validationResult } from "express-validator";
 import { comparePassword, hashPassword } from "../utils/hashBcrypt.js";
 import User from "../models/User.js";
+import jwt from "jsonwebtoken";
 
 export const register = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
@@ -20,5 +21,6 @@ export const login = async (req: Request, res: Response) => {
   if (!isPasswordValid) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
-  res.status(200).json({ message: "Login" });
+  const token  = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
+  res.status(200).json({ message: "Login", token });
 };
