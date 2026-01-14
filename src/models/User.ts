@@ -14,6 +14,9 @@ const userSchema = new Schema({
         type: String,
         required: true,
     },
+}, {
+    timestamps: true,
+    collection: "users",
 });
 
 export default model("User", userSchema);
