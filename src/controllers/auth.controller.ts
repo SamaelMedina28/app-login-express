@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { validationResult } from "express-validator";
-import { hashPassword } from "../utils/hashBcrypt.js";
+import { comparePassword, hashPassword } from "../utils/hashBcrypt.js";
 import User from "../models/User.js";
 
 export const register = async (req: Request, res: Response) => {
@@ -10,6 +10,15 @@ export const register = async (req: Request, res: Response) => {
   res.status(201).json({ message: "User created", user });
 };
 
-export const login = (req: Request, res: Response) => {
+export const login = async (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+  const isPasswordValid = comparePassword(password, user.password);
+  if (!isPasswordValid) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
   res.status(200).json({ message: "Login" });
 };
