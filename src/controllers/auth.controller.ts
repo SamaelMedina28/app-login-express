@@ -1,5 +1,4 @@
 import type { Request, Response } from "express";
-import { validationResult } from "express-validator";
 import { comparePassword, hashPassword } from "../utils/hashBcrypt.js";
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
@@ -8,19 +7,20 @@ export const register = async (req: Request, res: Response) => {
   const { name, email, password } = req.body;
   const hashedPassword = hashPassword(password);
   const user = await User.create({ name, email, password: hashedPassword });
-  res.status(201).json({ message: "User created", user });
+  res.status(201).json({ message: "Usuario creado correctamente", user });
 };
 
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    return res.status(401).json({ message: "Credenciales invalidas" });
   }
   const isPasswordValid = comparePassword(password, user.password);
   if (!isPasswordValid) {
-    return res.status(401).json({ message: "Invalid credentials" });
+    return res.status(401).json({ message: "Credenciales invalidas" });
   }
   const token  = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
-  res.status(200).json({ message: "Login", token });
+  res.cookie("token", token);
+  res.status(200).json({ message: "Se logueo correctamente" });
 };
