@@ -20,7 +20,18 @@ export const login = async (req: Request, res: Response) => {
   if (!isPasswordValid) {
     return res.status(401).json({ message: "Credenciales invalidas" });
   }
-  const token  = jwt.sign({ id: user._id }, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
-  res.cookie("token", token);
+  const token  = jwt.sign({ id: user._id}, process.env.JWT_SECRET || "secret", { expiresIn: "1h" });
+  res.cookie("token", token,{
+    httpOnly: true,
+    secure: true,
+    sameSite: "strict",
+    maxAge: 60 * 60 * 1000 // 1 hour
+  });
   res.status(200).json({ message: "Se logueo correctamente" });
+};
+
+//  Log out 
+export const logout = (req: Request, res: Response) => {
+  res.clearCookie("token");
+  res.status(200).json({ message: "Se deslogueo correctamente" });
 };
